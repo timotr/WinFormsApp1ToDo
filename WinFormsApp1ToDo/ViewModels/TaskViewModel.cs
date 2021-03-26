@@ -8,20 +8,11 @@ namespace WinFormsApp1ToDo.ViewModels
 {
     class TaskViewModel
     {
-        public event EventHandler TaskChanged;
-        protected virtual void OnItemChange(EventArgs e)
-        {
-            EventHandler handler = TaskChanged;
-            handler?.Invoke(this, e);
-        }
-
         private Task task;
-        private TaskListView taskListView;
         public TaskControl taskControl;
-        public TaskViewModel(Task task, TaskListView taskListView)
+        public TaskViewModel(Task task)
         {
             this.task = task;
-            this.taskListView = taskListView;
             taskControl = new TaskControl();
             taskControl.titleTBox.Text = task.title;
             taskControl.descTBox.Text = task.desc;
@@ -32,7 +23,7 @@ namespace WinFormsApp1ToDo.ViewModels
         private void Delete(object sender, EventArgs e)
         {
             ToDoAPI.DeleteTask(task);
-            taskListView.ReLoad();
+            OnTaskDelete(new EventArgs());
         }
 
         private void Save(object sender, EventArgs e)
@@ -43,6 +34,7 @@ namespace WinFormsApp1ToDo.ViewModels
                 task = ToDoAPI.SaveTask(task);
                 taskControl.messageLbl.Text = "Salvestamine õnnestus";
                 taskControl.messageLbl.ForeColor = Color.Green;
+                //OnItemChange(new EventArgs());
             }
             catch(Exception error)
             {
@@ -50,6 +42,13 @@ namespace WinFormsApp1ToDo.ViewModels
                 taskControl.messageLbl.ForeColor = Color.Red;
             }
             
+        }
+
+        public event EventHandler TaskDelete;
+        protected virtual void OnTaskDelete(EventArgs e)
+        {
+            EventHandler handler = TaskDelete;
+            handler?.Invoke(this, e);
         }
     }
 }
