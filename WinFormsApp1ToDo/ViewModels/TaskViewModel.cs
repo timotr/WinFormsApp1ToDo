@@ -23,7 +23,7 @@ namespace WinFormsApp1ToDo.ViewModels
         private void Delete(object sender, EventArgs e)
         {
             ToDoAPI.DeleteTask(task);
-            OnTaskDelete(new EventArgs());
+            OnTaskDelete(this);
         }
 
         private void Save(object sender, EventArgs e)
@@ -44,11 +44,11 @@ namespace WinFormsApp1ToDo.ViewModels
             
         }
 
-        public event EventHandler TaskDelete;
-        protected virtual void OnTaskDelete(EventArgs e)
+        public event EventHandler<TaskViewModel> TaskDelete;
+        protected virtual void OnTaskDelete(TaskViewModel deletedTask)
         {
-            EventHandler handler = TaskDelete;
-            handler?.Invoke(this, e);
+            EventHandler<TaskViewModel> handler = TaskDelete;
+            handler?.Invoke(this, deletedTask);
         }
     }
 }

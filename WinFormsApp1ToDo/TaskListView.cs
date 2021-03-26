@@ -5,14 +5,13 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using WinFormsApp1ToDo.DTO;
 using WinFormsApp1ToDo.ViewModels;
 
 namespace WinFormsApp1ToDo
 {
     public partial class TaskListView : Form
     {
-        
-
         public TaskListView()
         {
             InitializeComponent();
@@ -20,7 +19,13 @@ namespace WinFormsApp1ToDo
 
         private void TaskListView_Load(object sender, EventArgs e)
         {
-            ReLoad();
+            var tasks = ToDoAPI.GetTasks();
+            foreach (var task in tasks)
+            {
+                var taskView = new TaskViewModel(task);
+                taskView.TaskDelete += OnTaskDelete;
+                flowLayoutPanel1.Controls.Add(taskView.taskControl);
+            }
         }
 
 
@@ -32,27 +37,29 @@ namespace WinFormsApp1ToDo
         private void button1_Click(object sender, EventArgs e)
         {
             var taskView = new TaskViewModel(new DTO.Task());
-            taskView.TaskDelete += new EventHandler(OnTaskDelete);
+            taskView.TaskDelete += OnTaskDelete;
             flowLayoutPanel1.Controls.Add(taskView.taskControl);
         }
 
-        private void OnTaskDelete(object sender, EventArgs e)
+        private void OnTaskDelete(object sender, TaskViewModel deletedTask)
         {
-            ReLoad();
+            flowLayoutPanel1.Controls.Remove(deletedTask.taskControl);
         }
 
         public void ReLoad()
         {
-            //var oldScrollPosition = flowLayoutPanel1.   scroll position
+            var oldScrollPosition = flowLayoutPanel1.VerticalScroll.Value;
+
             var tasks = ToDoAPI.GetTasks();
             flowLayoutPanel1.Controls.Clear();
             foreach (var task in tasks)
             {
                 var taskView = new TaskViewModel(task);
-                taskView.TaskDelete += new EventHandler(OnTaskDelete);
+                taskView.TaskDelete += OnTaskDelete;
                 flowLayoutPanel1.Controls.Add(taskView.taskControl);
             }
-            // flowLayoutPanel1. scroll Position = oldScrollPosition
+
+            flowLayoutPanel1.VerticalScroll.Value = oldScrollPosition;
         }
     }
 }
